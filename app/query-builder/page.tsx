@@ -55,7 +55,7 @@ export function GenerateSQL(){
     const [sql, setSQL] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
     const [output, setOutput] = useState<JSX.Element | string>("");
-    const [databases, setDatabases] = useState<string[]>([]);
+    const [databases, setDatabases] = useState<{ id: string; db_name: string; db_type: string }[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     // object to store id and type of selected database
     const [selectedDatabase, setSelectedDatabase] = useState<{ id: string; db_type: string } | null>(null);
