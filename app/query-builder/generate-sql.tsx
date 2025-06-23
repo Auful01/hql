@@ -1,4 +1,5 @@
 "use client";
+import DynamicTransactionChart from "@/components/DynamicChart";
 import axios from "axios";
 import { Info } from "lucide-react";
 import { JSX, useEffect, useRef, useState } from "react";
@@ -17,7 +18,10 @@ export default function GenerateSQL(){
 
     const [isChart, setIsChart] = useState(false);
 
-    const [results, setResults] = useState<string[]>([]);
+    // store dynamic object for results
+    // this will be used for charting later
+    // type Results = { [key: string]: any }[];
+    const [results, setResults] = useState<{ [key: string]: any }[]>([]);
 
     const scrollableRef = useRef<HTMLDivElement | null>(null);
 
@@ -304,10 +308,8 @@ export default function GenerateSQL(){
      </div>
 
      <div className="col-span-12 lg:col-span:12 bg-[#0F172A] text-white p-6 space-y-4 rounded-2xl mt-4">
-            <div className="flex items-center justify-center h-32 bg-gray-900 rounded text-gray-500">
-              <p className="text-gray-500">Click "Create Chart" to visualize your results.</p>
-            </div>
-        {/* {
+        <h3 className="text-lg font-semibold mb-2">Dynamic Chart</h3>
+        {
           isChart ? (
             <DynamicTransactionChart data={results} />
           ) : (
@@ -315,7 +317,7 @@ export default function GenerateSQL(){
               <p className="text-gray-500">Click "Create Chart" to visualize your results.</p>
             </div>
           )    
-        } */}
+        }
      </div>
      </div>
     )
