@@ -18,6 +18,10 @@ export default function GenerateSQL(){
 
     const [isChart, setIsChart] = useState(false);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const itemsPerPage = 10; // Set the number of items per page
+
     // store dynamic object for results
     // this will be used for charting later
     // type Results = { [key: string]: any }[];
@@ -51,7 +55,7 @@ export default function GenerateSQL(){
     };
 
 
-    const jsonToTable = (json: any) => {
+    const jsonToTable = (json: any, total: number, page: number) => {
       const data = Array.isArray(json) ? json : [json];
       if (!data.length) return <p className="text-gray-500">No data</p>;
 
@@ -83,35 +87,58 @@ export default function GenerateSQL(){
                 ))}
               </tbody>
             </table>
+
+            {/* Paginate */}
+            <div className="flex justify-between items-center py-2">
+              <button className="bg-gray-700 px-3 py-2 rounded" onClick={() => executeSQL(page - 1, itemsPerPage)} disabled={currentPage === 1}>
+                Previous
+              </button>
+              <span>
+                Page {page} of {total}
+              </span>
+              <button className="bg-gray-700 px-3 py-2 rounded" onClick={() => executeSQL(page + 1, itemsPerPage)} disabled={currentPage === total}>
+                Next
+              </button>
+            </div>
           </div>
         </div>
-        // </div>
       );
     };
 
-    const executeSQL = async () => {
+    const executeSQL = async (page = 1, per_page = 10) => {
         if (!sql.trim()) return;
         const query = sql.replace(/^```sql\n/, '').replace(/\n```$/, '').trim();
         setIsGenerating(true);
         console.log(selectedDatabase);
+        setCurrentPage(page);
         
         try {
-            const response = await axios.post("https://n8n.apergu.co.id/webhook/exec-sql", { 
+            const response = await axios.post("https://n8n.apergu.co.id/webhook/exec-sql2", { 
                 sql: query,
                 db_id: selectedDatabase?.id, // Pass the selected database ID,
-                db_type: selectedDatabase?.db_type // Pass the selected database type
+                db_type: selectedDatabase?.db_type, // Pass the selected database type
+                per_page: per_page,
+                page: page
              }, {
                 headers: { "Content-Type": "application/json" },
             });
 
             console.log("SQL Execution Response:", response.data);
             // setOutput(response.data.output || "No output received");
-            if (response.data && response.data.output) {
-                const jsonData = JSON.parse(response.data.output);
-                console.log("Parsed JSON Data:", jsonData);
-                setOutput(jsonToTable(jsonData));
-                console.log("Output set to:", jsonToTable(jsonData));
+            if (response.data) {
+                // const jsonData = JSON.parse(response.data.output);
+                // console.log("Parsed JSON Data:", jsonData);
+                // setOutput(jsonToTable(jsonData));
+                // console.log("Output set to:", jsonToTable(jsonData));
+                // setResults(jsonData); // Store results for charting
+                const jsonData = response.data;
+                // setCurrentPage(response.data.page || 1);
+                // setTotalPages(response.data.total || 1);
+                setOutput(jsonToTable(jsonData, response.data.total || 1, response.data.page || 1));
                 setResults(jsonData); // Store results for charting
+                console.log("Results set for charting:", jsonData);
+
+                console.log("Current Page:", currentPage, "Total Pages:", response.data.total);
             } else {
                 setOutput("No output received or invalid data format.");
             }
@@ -270,7 +297,7 @@ export default function GenerateSQL(){
                {isGenerating ? "Generating..." : "Generate SQL"}
              </button>
              <button className="bg-gray-700 px-3 py-2 rounded">Copy</button>
-             <button className="bg-green-700 px-3 py-2 rounded" onClick={executeSQL}>Run</button>
+             <button className="bg-green-700 px-3 py-2 rounded" onClick={() => executeSQL(1, 10)}>Run</button>
              <button className="bg-blue-700 px-3 py-2 rounded">Edit</button>
              <button className="bg-gray-700 px-3 py-2 rounded">Save</button>
              <button className="bg-gray-700 px-3 py-2 rounded">Load</button>
