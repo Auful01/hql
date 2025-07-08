@@ -105,6 +105,27 @@ export default function GenerateSQL(){
       );
     };
 
+    const handleDownloadCSV = () => {
+      if (!results || results.length === 0) return;
+      const filename = `query_results_${new Date().toISOString()}.csv`;
+      var data = results.map(row => {
+        return Object.values(row).map(value => {
+          if (typeof value === "string") {  
+            return `"${value.replace(/"/g, '""')}"`; // Escape quotes in strings
+          }
+          return value;
+        }).join(",");
+      }).join("\n");
+      data = `data:text/csv;charset=utf-8,${data}`;
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(data));
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      console.log("CSV downloaded:", filename);
+    };
+
     const executeSQL = async (page = 1, per_page = 10) => {
         if (!sql.trim()) return;
         const query = sql.replace(/^```sql\n/, '').replace(/\n```$/, '').trim();
@@ -240,7 +261,7 @@ export default function GenerateSQL(){
  
          <div className="mt-4">
            <label className="text-sm font-semibold">List Tables</label>
-            <div className="mt-2 bg-gray-800 p-3 rounded-lg" id="table-list">
+            <div className="mt-2 bg-gray-800 p-3 rounded-lg" id="table-list" style={{ maxHeight: "300px", overflowY: "auto" }}>
               {
                  isLoading ? (
                 <p className="text-gray-500">Loading tables...</p>
@@ -329,7 +350,11 @@ export default function GenerateSQL(){
                 console.log("Creating chart with results:", results);
              }
              }>Create Chart</button>
-             <button className="bg-gray-700 px-3 py-2 rounded text-white">Export CSV</button>
+             <button className="bg-gray-700 px-3 py-2 rounded text-white"
+              onClick={handleDownloadCSV} disabled={!results || results.length === 0}>
+                <span className="mr-1">Download</span>
+                <span className="hidden sm:inline">CSV</span>
+           </button>
            </div>
          </div>
      </div>

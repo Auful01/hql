@@ -1,6 +1,10 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
 } from "recharts";
 
 type Props = {
@@ -11,6 +15,7 @@ const DynamicTransactionChart: React.FC<Props> = ({ data }) => {
   const [xAxisField, setXAxisField] = useState<string>("type");
   const [yAxisField, setYAxisField] = useState<string>("count");
 
+  const [chartType, setChartType] = useState<string>("bar");
   // Get all field names from data
   const fieldNames = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -67,6 +72,7 @@ const DynamicTransactionChart: React.FC<Props> = ({ data }) => {
         <h2 className="text-lg font-semibold">
           Transactions by {xAxisField} vs {yAxisField}
         </h2>
+        
 
         {/* X-Axis Dropdown */}
         <select
@@ -94,9 +100,24 @@ const DynamicTransactionChart: React.FC<Props> = ({ data }) => {
             </option>
           ))}
         </select>
+
+        {/* Table Type */}
+        <select
+          className="px-3 py-2 border rounded text-sm text-gray-700"
+          value="bar"
+          onChange={(e) => setChartType(e.target.value)}
+        >
+          <option value="bar">Bar Chart</option>
+          <option value="line">Line Chart</option>
+          <option value="pie">Pie Chart</option>
+        </select>
       </div>
 
-      <ResponsiveContainer width="100%" height="100%">
+
+        
+      {
+        chartType === "bar" && 
+        <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
@@ -111,6 +132,48 @@ const DynamicTransactionChart: React.FC<Props> = ({ data }) => {
           <Bar dataKey="value" fill="#4F46E5" />
         </BarChart>
       </ResponsiveContainer>
+      }
+      {
+        chartType === "line" && 
+        
+        <ResponsiveContainer width="100%" height="100%">
+        <LineChart width={500} height={300} data={chartData}>
+          <CartesianGrid strokeDasharray="3 3"/>
+          <XAxis 
+            dataKey="label"
+            angle={-45}                     // Rotasi label
+            textAnchor="end"               // Supaya rata kanan
+            interval={0}                   // Paksa tampil semua label
+            height={60}                    // Tinggikan area X-axis agar tidak terpotong
+          />
+          <YAxis/>
+          <Tooltip />
+          <Line type="monotone" dataKey="value" stroke="#8884d8" />
+          {/* <Line type="monotone" dataKey="pv" stroke="#82ca9d" /> */}
+        </LineChart>
+      </ResponsiveContainer>
+      }
+      {
+        chartType === "pie" && 
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="label"
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              fill="#8884d8"
+              label
+            />
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      }
+      
+
+      
     </div>
   );
 };
