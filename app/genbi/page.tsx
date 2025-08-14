@@ -62,7 +62,7 @@ export default function GenBIPage() {
         if (activeThreadIndex === null) {
             const newThread: Thread = {
                 id: generateSessionId(),
-                databaseId: selectedDb.id,
+                databaseId: JSON.parse(selectedDb).id, // ambil dari localStorage
                 title: 'Untitled',
                 messages: [userQuestion],
                 createdAt: Date.now(),
