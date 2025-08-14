@@ -1,5 +1,6 @@
 "use client";
 import DynamicTransactionChart from "@/components/DynamicChart";
+import MarkdownRenderer from "@/components/ReactMarkdownRender";
 import axios from "axios";
 import { Info } from "lucide-react";
 import { JSX, useEffect, useRef, useState } from "react";
@@ -15,6 +16,7 @@ export default function GenerateSQL(){
     // object to store id and type of selected database
     const [selectedDatabase, setSelectedDatabase] = useState<{ id: string; db_type: string } | null>(null);
     const [tables, setTables] = useState<string[]>([]);
+    const [explanation, setExplanation] = useState("");
 
     const [isChart, setIsChart] = useState(false);
 
@@ -146,17 +148,18 @@ export default function GenerateSQL(){
 
             console.log("SQL Execution Response:", response.data);
             // setOutput(response.data.output || "No output received");
-            if (response.data) {
+            if (response.data.table) {
                 // const jsonData = JSON.parse(response.data.output);
                 // console.log("Parsed JSON Data:", jsonData);
                 // setOutput(jsonToTable(jsonData));
                 // console.log("Output set to:", jsonToTable(jsonData));
                 // setResults(jsonData); // Store results for charting
-                const jsonData = response.data;
+                const jsonData = response.data.table;
                 // setCurrentPage(response.data.page || 1);
                 // setTotalPages(response.data.total || 1);
                 setOutput(jsonToTable(jsonData, response.data.total || 1, response.data.page || 1));
                 setResults(jsonData); // Store results for charting
+                setExplanation(response.data.output || "No explanation available.");
                 console.log("Results set for charting:", jsonData);
 
                 console.log("Current Page:", currentPage, "Total Pages:", response.data.total);
@@ -358,6 +361,26 @@ export default function GenerateSQL(){
            </div>
          </div>
      </div>
+
+     {/* Section Explain result */}
+      <div className="col-span-12 lg:col-span-12 bg-gray-900 text-white p-6 space-y-4 rounded-2xl mt-4">
+          <h3 className="text-lg font-semibold mb-2">Explain SQL</h3>
+          <p>
+            <span className="text-sm text-gray-400">Explain the SQL query generated above:</span>
+          </p>
+
+          {
+            explanation ? (
+              <div className="bg-gray-800 p-3 rounded-lg">
+                <MarkdownRenderer content={explanation} />
+              </div>
+            ) : (
+              <p className="text-gray-500">No explanation available. Run a query to see results.</p>
+            )
+          }
+          
+      </div>
+
 
      <div className="col-span-12 lg:col-span:12 bg-[#0F172A] text-white p-6 space-y-4 rounded-2xl mt-4">
         <h3 className="text-lg font-semibold mb-2">Dynamic Chart</h3>

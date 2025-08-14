@@ -105,7 +105,12 @@ const DynamicTransactionChart: React.FC<Props> = ({ data }) => {
         <select
           className="px-3 py-2 border rounded text-sm text-gray-700"
           value="bar"
-          onChange={(e) => setChartType(e.target.value)}
+          onChange={(e) =>
+          {
+            console.log("Chart type changed to:", e.target.value);
+            setChartType(e.target.value);
+          }
+            }
         >
           <option value="bar">Bar Chart</option>
           <option value="line">Line Chart</option>

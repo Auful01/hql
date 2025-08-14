@@ -17,6 +17,8 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
+  Home,
+  WifiHighIcon
 } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -28,6 +30,8 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
+  { icon: <Home size={18} />, href: "/", text: "Home" },
+  { icon: <WifiHighIcon size={18} />, href: "/genbi", text: "GenBI" },
   { icon: <LayoutDashboard size={18} />, href: "/query-builder", text: "Query Builder" },
   { icon: <Database size={18} />, href: "/database-setup", text: "Database Setup" },
   { icon: <Search size={18} />, href: "/assistant", text: "SQL Assistants" },
