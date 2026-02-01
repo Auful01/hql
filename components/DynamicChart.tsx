@@ -67,13 +67,26 @@ const DynamicTransactionChart: React.FC<Props> = ({ data }) => {
   }, [data, xAxisField, yAxisField]);
 
   return (
-    <div className="w-full h-[400px] bg-white rounded p-4">
+    <div className="w-full h-[400px] rounded p-4">
       <div className="flex justify-between items-center mb-4 gap-2 flex-wrap">
         <h2 className="text-lg font-semibold">
           Transactions by {xAxisField} vs {yAxisField}
         </h2>
         
-
+        <select
+          className="px-3 py-2 border rounded text-sm text-gray-700"
+          value={chartType}
+          onChange={(e) =>
+          {
+            console.log("Chart type changed to:", e.target.value);
+            setChartType(e.target.value);
+          }
+            }
+        >
+          <option value="bar">Bar Chart</option>
+          <option value="line">Line Chart</option>
+          <option value="pie">Pie Chart</option>
+        </select>
         {/* X-Axis Dropdown */}
         <select
           value={xAxisField}
@@ -102,20 +115,7 @@ const DynamicTransactionChart: React.FC<Props> = ({ data }) => {
         </select>
 
         {/* Table Type */}
-        <select
-          className="px-3 py-2 border rounded text-sm text-gray-700"
-          value="bar"
-          onChange={(e) =>
-          {
-            console.log("Chart type changed to:", e.target.value);
-            setChartType(e.target.value);
-          }
-            }
-        >
-          <option value="bar">Bar Chart</option>
-          <option value="line">Line Chart</option>
-          <option value="pie">Pie Chart</option>
-        </select>
+       
       </div>
 
 

@@ -17,7 +17,7 @@ export default function ConnectDatabase() {
 
   const handleConnect = async () => {
     try {
-        const response = await axios.post("https://n8n.apergu.co.id/webhook/save-db", {
+        const response = await axios.post("https://n8n.apergu.co.id/webhook-test/save-db", {
             "db_name": databaseName,
             "db_type": dbType,
             "db_host": host,
