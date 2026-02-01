@@ -1,4 +1,3 @@
-// app/database-setup/page.tsx
 "use client";
 
 import {
@@ -12,106 +11,171 @@ import { useState } from "react";
 import ConnectDatabase from "./connect";
 
 export default function DatabaseSetupPage() {
-   const [selectedMenu, setSelectedMenu] = useState("");
+  const [selectedMenu, setSelectedMenu] = useState("");
 
   return (
-    <div className="grid grid-cols-12  gap-4 p-4">
-      {/* Step Indicator */}
-      <div className="col-span-12 lg:col-span-12 bg-[#0F172A] rounded-lg p-6">
-        <div className="flex justify-center gap-4 p-4 text-sm text-gray-300">
-            <Step label="Choose" active />
-            <Step label="Configure"  active={
-selectedMenu !== ""  } />
-            <Step label="Finish" />
+    <div className="min-h-screen">
+      <div className="flex items-start justify-center py-10" style={{padding: 0}}>
+        <div className="w-full">
+          <div className="hq-card p-6 flex flex-col gap-6">
+            {/* Step Indicator */}
+            <div className="flex justify-center gap-6 text-sm">
+              <Step label="Choose" active />
+              <Step label="Configure" active={selectedMenu !== ""} />
+              <Step label="Finish" />
+            </div>
+
+            {selectedMenu === "connect-to-database" && <ConnectDatabase />}
+            {selectedMenu === "" && (
+              <DefaultPage setSelectedMenu={setSelectedMenu} />
+            )}
+          </div>
         </div>
-
-        {
-            selectedMenu === "connect-to-database" && (
-                <ConnectDatabase />
-            )
-        }
-
-        {
-            selectedMenu === "" && (
-                <DefaultPage selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} />
-            )
-        }
-      
       </div>
     </div>
   );
 }
 
-function DefaultPage({selectedMenu, setSelectedMenu}: {selectedMenu: string; setSelectedMenu: (menu: string) => void}) {
-    return(
-        <>
-          {/* Title */}
-          <div className="text-start">
-          <h1 className="text-3xl font-bold">Welcome to Database Setup</h1>
-          <p className="text-gray-400 mt-2">
+/* ================= DEFAULT PAGE ================= */
+
+function DefaultPage({
+  setSelectedMenu,
+}: {
+  setSelectedMenu: (menu: string) => void;
+}) {
+  return (
+    <>
+      {/* TITLE */}
+      <div>
+        <h1 className="text-2xl font-semibold">
+          Welcome to Database Setup
+        </h1>
+        <p style={{ color: "var(--muted)", marginTop: 6 }}>
           Let’s get your workspace ready. How would you like to start?
-          </p>
+        </p>
       </div>
 
-      {/* Options Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-          <Card icon={<PlusCircle size={28} />} title="Start from Scratch" desc="Build your own database structure" onselect={() => setSelectedMenu("start-from-scratch")} />
-          <Card icon={<Database size={28} />} title="Connect to Your Database" desc="Use your existing database from MySQL, SQL Server, PostgreSQL, MongoDB, Snowflake, Oracle Cloud, BigQuery, Clickhouse, Redshift, SQLite, Databricks, Firebird, Microsoft Access, and more." 
+      {/* OPTIONS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        <Card
+          icon={<PlusCircle size={24} />}
+          title="Start from Scratch"
+          desc="Build your own database structure"
+          onselect={() => setSelectedMenu("start-from-scratch")}
+        />
+
+        <Card
+          icon={<Database size={24} />}
+          title="Connect to Your Database"
+          desc="Use your existing database from MySQL, PostgreSQL, SQL Server, MongoDB, BigQuery, Snowflake, and more."
           onselect={() => setSelectedMenu("connect-to-database")}
-          />
-          <Card icon={<UploadCloud size={28} />} title="Upload SQL File" desc="Import schema from a .sql file" 
+        />
+
+        <Card
+          icon={<UploadCloud size={24} />}
+          title="Upload SQL File"
+          desc="Import schema from a .sql file"
           onselect={() => setSelectedMenu("upload-sql-file")}
-          />
-          <Card icon={<FileSpreadsheet size={28} />} title="Upload a Spreadsheet" desc="Use an Excel or CSV file as your database" 
+        />
+
+        <Card
+          icon={<FileSpreadsheet size={24} />}
+          title="Upload a Spreadsheet"
+          desc="Use an Excel or CSV file as your database"
           onselect={() => setSelectedMenu("upload-spreadsheet")}
-          />
-          <Card icon={<Star size={28} />} title="Try a Sample" desc="Explore with ready-made example data" 
+        />
+
+        <Card
+          icon={<Star size={24} />}
+          title="Try a Sample"
+          desc="Explore with ready-made example data"
           onselect={() => setSelectedMenu("try-sample")}
-          />
+        />
       </div>
 
-      {/* Footer Links */}
-      <div className="text-center text-sm text-gray-400 mt-8 space-x-4">
-          <a href="#" className="underline">Read the documentation</a>
-          <span>·</span>
-          <a href="#" className="underline">View your existing databases</a>
+      {/* FOOTER */}
+      <div
+        className="text-sm mt-6 flex gap-4"
+        style={{ color: "var(--muted)" }}
+      >
+        <a href="#" className="underline">
+          Read the documentation
+        </a>
+        <span>·</span>
+        <a href="#" className="underline">
+          View your existing databases
+        </a>
       </div>
 
-      {/* Next Button */}
-      <div className="flex justify-end mt-4  mx-auto">
-          <button className="flex items-center gap-2 px-6 py-2 bg-[#326358] hover:bg-purple-700 text-white rounded">
-          Next <span className="text-lg">→</span>
-          </button>
+      {/* NEXT BUTTON */}
+      <div className="flex justify-end mt-4">
+        <button className="hq-btn-primary flex items-center gap-2 px-6">
+          Next <span>→</span>
+        </button>
       </div>
-      </>
-    )
+    </>
+  );
 }
 
-function Step({ label, active = false }: { label: string; active?: boolean }) {
+/* ================= COMPONENTS ================= */
+
+function Step({
+  label,
+  active = false,
+}: {
+  label: string;
+  active?: boolean;
+}) {
   return (
     <div className="flex items-center gap-2">
-      <div className={`w-6 h-6 rounded-full text-sm font-semibold flex items-center justify-center border ${
-        active ? "bg-[#326358] border-[#589f8f] text-white" : "bg-[#1E2540] border-gray-500"
-      }`}>
-        
+      <div
+        className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold"
+        style={{
+          background: active ? "var(--accent)" : "transparent",
+          border: `1px solid ${
+            active ? "var(--accent)" : "var(--border)"
+          }`,
+          color: active ? "#fff" : "var(--muted)",
+        }}
+      >
+        ✓
       </div>
-      <span>{label}</span>
+      <span style={{ color: active ? "var(--text)" : "var(--muted)" }}>
+        {label}
+      </span>
     </div>
   );
 }
-
-function Card({ icon, title, desc, onselect }: { icon: React.ReactNode; title: string; desc: string; onselect?: () => void }) {
-  const handleClick = () => {
-    if (onselect) {
-      onselect();
-    }
-  };
+function Card({
+  icon,
+  title,
+  desc,
+  onselect,
+  fullWidth = false,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  onselect?: () => void;
+  fullWidth?: boolean;
+}) {
   return (
-    <div className="bg-gray-800 hover:bg-gray-900 transition rounded-xl p-4 space-y-2 border border-[#2C365C] cursor-pointer" onClick={handleClick}>
-      <div className="flex items-center gap-3 text-[#326358] font-semibold">
-        {icon} <span>{title}</span>
+    <div
+      onClick={onselect}
+      className={`hq-card-2 p-4 cursor-pointer transition ${
+        fullWidth ? "md:col-span-2" : ""
+      }`}
+    >
+      <div className="flex items-center gap-3 font-medium">
+        <span style={{ color: "var(--accent)" }}>{icon}</span>
+        {title}
       </div>
-      <p className="text-sm text-gray-300 pl-10 leading-relaxed">{desc}</p>
+      <p
+        className="text-sm mt-2 leading-relaxed"
+        style={{ color: "var(--muted)", paddingLeft: 36 }}
+      >
+        {desc}
+      </p>
     </div>
   );
 }

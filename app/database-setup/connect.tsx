@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Database, Wifi, ChevronLeft } from "lucide-react";
 import axios from "axios";
 
-
 export default function ConnectDatabase() {
   const [dbType, setDbType] = useState("mysql");
   const [host, setHost] = useState("");
@@ -13,166 +12,226 @@ export default function ConnectDatabase() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [databaseName, setDatabaseName] = useState("");
-  const [testConnection, setTestConnection] = useState("");
+  const [testConnection, setTestConnection] = useState<
+    "" | "loading" | "true" | "false"
+  >("");
+
+  /* ================= API ================= */
 
   const handleConnect = async () => {
     try {
-        const response = await axios.post("https://n8n.apergu.co.id/webhook-test/save-db", {
-            "db_name": databaseName,
-            "db_type": dbType,
-            "db_host": host,
-            "db_port": port,
-            "db_username": username,    
-            "db_password": password,
-        });
-        console.log("Database connected successfully:", response.data);
+      const response = await axios.post(
+        "https://n8n.apergu.co.id/webhook-test/save-db",
+        {
+          db_name: databaseName,
+          db_type: dbType,
+          db_host: host,
+          db_port: port,
+          db_username: username,
+          db_password: password,
+        }
+      );
+      console.log("Database connected successfully:", response.data);
     } catch (error) {
-        console.error("Error connecting to database:", error);
-        // Optionally, you can set an error state here to display an error message in the UI
+      console.error("Error connecting to database:", error);
     }
   };
 
   const handleTestConnection = async () => {
     setTestConnection("loading");
     try {
-      const response = await axios.post("https://n8n.apergu.co.id/webhook/test-db", {
-        "db_name": databaseName,
-        "db_type": dbType,
-        "db_host": host,
-        "db_port": port,
-        "db_username": username,    
-        "db_password": password,
-      });
+      const response = await axios.post(
+        "https://n8n.apergu.co.id/webhook/test-db",
+        {
+          db_name: databaseName,
+          db_type: dbType,
+          db_host: host,
+          db_port: port,
+          db_username: username,
+          db_password: password,
+        }
+      );
       console.log("Connection successful:", response.data);
       setTestConnection("true");
     } catch (error) {
-        setTestConnection("false");
       console.error("Connection failed:", error);
+      setTestConnection("false");
     }
   };
 
+  /* ================= UI ================= */
+
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4">Connect to Database</h2>
-      <div className="grid grid-cols-12 gap-4 mb-4">
-        {/* Alert */}
-        {
-            testConnection == "true" ? (
-            <div className="col-span-12 bg-green-100 text-green-800 p-4 rounded mb-4">
-              <p className="text-sm">Connection successful!</p>
-            </div>
-            ) : testConnection == "false" ? (
-            <div className="col-span-12 bg-red-100 text-red-800 p-4 rounded mb-4">
-              <p className="text-sm">Connection failed. Please check your credentials.</p>
-            </div>
-            ) : testConnection == "loading" ? (
-            <div className="col-span-12 bg-yellow-100 text-yellow-800 p-4 rounded mb-4">
-              <p className="text-sm">Testing connection...</p>
-            </div>
-            ) : null
-            
-        }
-        <div className="col-span-6 lg:col-span-6 mb-4">
-            <div className="mb-4 ">
-                <label className="block mb-2">Database Type</label>
-                <select
-                value={dbType}
-                onChange={(e) => setDbType(e.target.value)}
-                className="w-full p-2 bg-gray-800 text-white rounded"
-                >
-                <option value="mysql">MySQL</option>
-                <option value="postgresql">PostgreSQL</option>
-                <option value="sqlite">SQLite</option>
-                </select>
-            </div>
-            <div className="mb-4">
-                <label className="block mb-2">Name</label>
-                <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 bg-gray-800 text-white rounded"
-                />
-                </div>
-            <div className="mb-4">
-                <label className="block mb-2">Host</label>
-                <input
-                type="text"
-                value={host}
-                onChange={(e) => setHost(e.target.value)}
-                className="w-full p-2 bg-gray-800 text-white rounded"
-                />
-            </div>
-            <div className="mb-4">
-                <label className="block mb-2">Port</label>
-                <input
-                type="text"
-                value={port}
-                onChange={(e) => setPort(e.target.value)}
-                className="w-full p-2 bg-gray-800 text-white rounded"
-                />
-            </div>
+    <div className="flex flex-col gap-6">
+      {/* HEADER */}
+      <div>
+        <h2 className="text-lg font-semibold">Connect to Database</h2>
+        <p style={{ color: "var(--muted)", marginTop: 4 }}>
+          Enter your database credentials to connect.
+        </p>
+      </div>
+
+      {/* STATUS */}
+      {testConnection === "true" && (
+        <StatusBox type="success" text="Connection successful!" />
+      )}
+      {testConnection === "false" && (
+        <StatusBox
+          type="error"
+          text="Connection failed. Please check your credentials."
+        />
+      )}
+      {testConnection === "loading" && (
+        <StatusBox type="loading" text="Testing connection…" />
+      )}
+
+      {/* FORM */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* LEFT */}
+        <div className="flex flex-col gap-4">
+          <Field label="Database Type">
+            <select
+              value={dbType}
+              onChange={(e) => setDbType(e.target.value)}
+              className="hq-input"
+            >
+              <option value="mysql">MySQL</option>
+              <option value="postgresql">PostgreSQL</option>
+              <option value="sqlite">SQLite</option>
+            </select>
+          </Field>
+
+          <Field label="Name">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="hq-input"
+            />
+          </Field>
+
+          <Field label="Host">
+            <input
+              type="text"
+              value={host}
+              onChange={(e) => setHost(e.target.value)}
+              className="hq-input"
+              placeholder="e.g. 127.0.0.1"
+            />
+          </Field>
+
+          <Field label="Port">
+            <input
+              type="text"
+              value={port}
+              onChange={(e) => setPort(e.target.value)}
+              className="hq-input"
+              placeholder="3306"
+            />
+          </Field>
         </div>
-        <div className="col-span-6 lg:col-span-6 mb-4">
-            <div className="mb-4">
-                <label className="block mb-2">Username</label>
-                <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full p-2 bg-gray-800 text-white rounded"
-                />
-            </div>
-            <div className="mb-4">
-                <label className="block mb-2">Password</label>
-                <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 bg-gray-800 text-white rounded"
-                />
-                </div>
-                <div className="mb-4">
-                <label className="block mb-2">Database Name</label>
-                <input
-                type="text"
-                value={databaseName}
-                onChange={(e) => setDatabaseName(e.target.value)}
-                className="w-full p-2 bg-gray-800 text-white rounded"
-                />
-                </div>
+
+        {/* RIGHT */}
+        <div className="flex flex-col gap-4">
+          <Field label="Username">
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="hq-input"
+            />
+          </Field>
+
+          <Field label="Password">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="hq-input"
+            />
+          </Field>
+
+          <Field label="Database Name">
+            <input
+              type="text"
+              value={databaseName}
+              onChange={(e) => setDatabaseName(e.target.value)}
+              className="hq-input"
+            />
+          </Field>
         </div>
       </div>
 
+      {/* ACTIONS */}
+      <div className="flex justify-between items-center pt-4 border-t"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <button className="hq-btn flex items-center gap-2">
+          <ChevronLeft size={18} />
+          Back
+        </button>
 
-    <div className="flex justify-between">
-            <button
-                onClick={() => console.log("Going back...")}
-                className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded mr-2"
-            >
-                <ChevronLeft className="inline mr-2" size={20} />
-                Back
-            </button>
+        <div className="flex gap-3">
+          <button
+            onClick={handleTestConnection}
+            className="hq-btn flex items-center gap-2"
+          >
+            <Wifi size={18} />
+            Test Connection
+          </button>
 
-        <div className="flex justify-end">
-            {/* Button Test */}
-            <button
-                onClick={handleTestConnection}
-                className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded mr-2"
-            >
-                <Wifi className="inline mr-2" size={20} />
-                Test Connection
-            </button>
-
-            <button
-                onClick={handleConnect}
-                className=" bg-[#326358] px-4 hover:bg-purple-700 text-white py-2 rounded"
-            >
-                <Database className="inline mr-2" size={20} />
-                Connect to Database
-            </button>
+          <button
+            onClick={handleConnect}
+            className="hq-btn-primary flex items-center gap-2"
+          >
+            <Database size={18} />
+            Connect Database
+          </button>
         </div>
+      </div>
     </div>
+  );
+}
+
+/* ================= SMALL COMPONENTS ================= */
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-sm" style={{ color: "var(--muted)" }}>
+        {label}
+      </label>
+      {children}
     </div>
-    );
+  );
+}
+
+function StatusBox({
+  type,
+  text,
+}: {
+  type: "success" | "error" | "loading";
+  text: string;
+}) {
+  const color =
+    type === "success"
+      ? "var(--accent-2)"
+      : type === "error"
+      ? "#ef4444"
+      : "var(--muted)";
+
+  return (
+    <div
+      className="hq-card-2 p-3 text-sm"
+      style={{ color, borderColor: color }}
+    >
+      {text}
+    </div>
+  );
 }

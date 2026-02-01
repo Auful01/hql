@@ -1,24 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
-import SidebarWrapper from "@/components/SidebarWrapper";
-import PageTitle from "@/components/PageTitle";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import AppShell from "@/components/AppShell";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-poppins", // optional: buat custom CSS variable
-  weight: ["300", "400", "500", "600", "700"], // sesuaikan dengan kebutuhan
+  variable: "--font-poppins",
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 
@@ -33,17 +22,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable}`}>
-      <body className="flex h-screen overflow-hidden">
-        <SidebarWrapper />
-        <main className="flex-1 p-4 overflow-auto">
-          {/* Judul menyesuaikan pathname */}
-          <div className="col-span-12">
-            <PageTitle />
-        </div>
-          {/* Konten */}
-          {children}
-        </main>
+    <html lang="en" className={poppins.variable}>
+      <body>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
